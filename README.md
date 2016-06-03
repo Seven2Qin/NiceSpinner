@@ -22,6 +22,7 @@
 
    spinner.addCallBack(new SpinnerCallback());
 ```
+
   ##### 代码分析
    loadData：主要用于Spinner内置的ListView加载下拉数据;
 
