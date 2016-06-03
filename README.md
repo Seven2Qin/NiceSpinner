@@ -35,5 +35,10 @@
 
    spinner.setDataCount(52, DEFAULT_COUNT);//设置显示数据的条数
 
+
+ - **跑马灯效果**:
+ -
+   在Spinner的text过长时，显示不全所有内容，会出现跑马灯效果
+
 ## 反馈与建议
 - 邮箱：<seven2qin@gmail.com>
