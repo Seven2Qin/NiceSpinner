@@ -26,7 +26,7 @@
 
    setText：主要用于在选中item时，事件的处理;
 - **其它方法** ：
--
+
    spinner.setText();设置Spinner的默认显示内容
 
    spinner.setSpinnerListHeight();下拉item列表的高度
