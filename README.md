@@ -6,7 +6,7 @@
 - **添加数据** ：需要使用setDataList方法，将数据塞入List集合
 - **数据回调** ：
 
-##### 代码块
+  ##### 代码块
 ```java
 
    private class SpinnerCallback implements NiceSpinner.NiceSpinnerCallBack {
@@ -22,7 +22,7 @@
 
    spinner.addCallBack(new SpinnerCallback());
 ```
-##### 代码分析
+  ##### 代码分析
    loadData：主要用于Spinner内置的ListView加载下拉数据;
 
    setText：主要用于在选中item时，事件的处理;
