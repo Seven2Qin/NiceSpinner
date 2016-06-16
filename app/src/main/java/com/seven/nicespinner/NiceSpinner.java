@@ -9,6 +9,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -18,6 +21,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.seven.nicespinner.R;
 import java.util.ArrayList;
 
 /**
@@ -38,6 +42,8 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
     private int clickPsition = 0;
     private TextView spinnerText;
     private ImageView arrowImg;
+    private Animation rotateUp;
+    private Animation rotateDown;
     private NiceSpinnerCallBack mCallBack;
     private ListViewAdapter mAdapter;
     private int moreCount;//加载更多数据
@@ -84,14 +90,19 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
         spinnerText.setGravity(Gravity.CENTER);
         spinnerText.setId(R.id.spinner_text);
         spinnerText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);//unit->1代表dp
-        LayoutParams textParams = new LayoutParams(screenWidth / 4
+        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(screenWidth / 4
                 , LayoutParams.WRAP_CONTENT);
         textParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 
         arrowImg = new ImageView(mContext);
         arrowImg.setImageResource(R.drawable.icon_spinner_arrow);
-        LayoutParams imageParams = new LayoutParams(LayoutParams.WRAP_CONTENT
-                , LayoutParams.WRAP_CONTENT);
+        rotateUp = AnimationUtils.loadAnimation(mContext, R.anim.spinner_arrow_animation_up);//创建动画
+        rotateUp.setInterpolator(new LinearInterpolator());//设置为线性旋转
+        rotateDown = AnimationUtils.loadAnimation(mContext, R.anim.spinner_arrow_animation_down);//创建动画
+        rotateDown.setInterpolator(new LinearInterpolator());//设置为线性旋转
+
+        RelativeLayout.LayoutParams imageParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT
+                , RelativeLayout.LayoutParams.WRAP_CONTENT);
         imageParams.addRule(RelativeLayout.CENTER_VERTICAL);
         imageParams.addRule(RelativeLayout.RIGHT_OF, spinnerText.getId());
 
@@ -105,6 +116,10 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
         spinnerText.setText(text);
     }
 
+    public String getText() {
+        return spinnerText.getText().toString();
+    }
+
     public void setDataList(ArrayList<String> list) {
         this.mList = list;
         if (spinnerText.getText().toString() == null ||
@@ -115,6 +130,9 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
+
+        rotateUp.setFillAfter(true);
+        arrowImg.startAnimation(rotateUp);
 
         spinnerListWidth = spinnerListWidth == 0 ? ViewGroup.LayoutParams.MATCH_PARENT : spinnerListWidth;
         spinnerListHeight = spinnerListHeight == 0 ? ViewGroup.LayoutParams.WRAP_CONTENT : spinnerListHeight;
@@ -129,6 +147,14 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
         mPopupWindow.setFocusable(true);//可以试试设为false的结果
         //将window视图显示在NiceSpinner下面
         mPopupWindow.showAsDropDown(this);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                rotateDown.setFillAfter(true);
+                // !rotate.getFillAfter() 每次都取相反值，使得可以不恢复原位的旋转
+                arrowImg.startAnimation(rotateDown);
+            }
+        });
         ListView lv = (ListView) mPopView.findViewById(R.id.list_nice_spinner);
         mAdapter = new ListViewAdapter(mContext, mList);
         lv.setAdapter(mAdapter);
@@ -169,6 +195,12 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
 
         lv.setSelection(clickPsition);
 
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        arrowImg.setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
     public int getCurrentPosition() {
