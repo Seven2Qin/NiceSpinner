@@ -39,5 +39,9 @@
 
    在Spinner的text过长时，显示不全所有内容，会出现跑马灯效果
 
+- **展开收起动画效果**:
+
+      在Spinner展开item和关闭时出现旋转动画效果
+
 ## 反馈与建议
 - 邮箱：<seven2qin@gmail.com>
