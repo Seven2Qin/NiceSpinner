@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+
+    <declare-styleable name="NiceSpinner">
+        <attr name="Text" format="string" />
+        <attr name="TextColor" format="color" />
+        <attr name="RightOf" format="boolean" />
+    </declare-styleable>
+
+   
+</resources>

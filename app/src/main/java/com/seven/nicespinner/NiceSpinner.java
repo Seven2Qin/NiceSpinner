@@ -21,7 +21,6 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.seven.nicespinner.R;
 import java.util.ArrayList;
 
 /**
@@ -29,7 +28,7 @@ import java.util.ArrayList;
  */
 public class NiceSpinner extends RelativeLayout implements View.OnClickListener {
 
-    private static final int DEFAULT_MORE_COUNT = 5;
+   private static final int DEFAULT_MORE_COUNT = 5;
     private Context mContext;
     private DisplayMetrics dm;
     private int screenWidth;
@@ -55,17 +54,16 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
     public NiceSpinner(Context context) {
         super(context);
         mContext = context;
-        init();
     }
 
     public NiceSpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-        init();
+        init(attrs);
     }
 
 
-    public void init() {
+    public void init(AttributeSet attrs) {
 
         dm = mContext.getResources().getDisplayMetrics();
         screenWidth = dm.widthPixels;
@@ -90,7 +88,7 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
         spinnerText.setGravity(Gravity.CENTER);
         spinnerText.setId(R.id.spinner_text);
         spinnerText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);//unit->1代表dp
-        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(screenWidth / 4
+        LayoutParams textParams = new LayoutParams(LayoutParams.WRAP_CONTENT
                 , LayoutParams.WRAP_CONTENT);
         textParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 
@@ -101,10 +99,23 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
         rotateDown = AnimationUtils.loadAnimation(mContext, R.anim.spinner_arrow_animation_down);//创建动画
         rotateDown.setInterpolator(new LinearInterpolator());//设置为线性旋转
 
-        RelativeLayout.LayoutParams imageParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT
-                , RelativeLayout.LayoutParams.WRAP_CONTENT);
+        //设置相关属性
+        TypedArray t = mContext.obtainStyledAttributes(attrs, R.styleable.NiceSpinner);
+        String title = t.getString(R.styleable.NiceSpinner_Text);
+        int color = t.getColor(R.styleable.NiceSpinner_TextColor, Color.GRAY);
+        boolean toRight = t.getBoolean(R.styleable.NiceSpinner_RightOf, false);
+        spinnerText.setText(title);
+        spinnerText.setTextColor(color);
+
+        LayoutParams imageParams = new LayoutParams(LayoutParams.WRAP_CONTENT
+                , LayoutParams.WRAP_CONTENT);
         imageParams.addRule(RelativeLayout.CENTER_VERTICAL);
-        imageParams.addRule(RelativeLayout.RIGHT_OF, spinnerText.getId());
+        if (toRight) {
+            imageParams.addRule(RelativeLayout.RIGHT_OF, spinnerText.getId());
+        } else {
+            imageParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            imageParams.setMargins(0, 0, 14, 0);
+        }
 
         this.addView(spinnerText, textParams);
         this.addView(arrowImg, imageParams);
@@ -131,6 +142,9 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
     @Override
     public void onClick(View v) {
 
+        android.util.Log.i("seven", "123onClick");
+        if (mList == null) return;
+
         rotateUp.setFillAfter(true);
         arrowImg.startAnimation(rotateUp);
 
@@ -142,7 +156,7 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
         //通过view 和宽·高，构造PopopWindow
         mPopupWindow = new PopupWindow(mPopView, spinnerListWidth, spinnerListHeight, true);
         //此处为popwindow 设置背景，同事做到点击外部区域，popwindow消失
-        //mPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_white));
+        mPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_white));
         //设置焦点为可点击
         mPopupWindow.setFocusable(true);//可以试试设为false的结果
         //将window视图显示在NiceSpinner下面
@@ -195,6 +209,15 @@ public class NiceSpinner extends RelativeLayout implements View.OnClickListener 
 
         lv.setSelection(clickPsition);
 
+    }
+
+    public void startAnimation(boolean isUp) {
+        rotateUp.setFillAfter(true);
+        if (isUp) {
+            arrowImg.startAnimation(rotateUp);
+        } else {
+            arrowImg.startAnimation(rotateDown);
+        }
     }
 
     @Override
